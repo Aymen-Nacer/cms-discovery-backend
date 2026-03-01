@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "removeComments": true,
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "**/*spec.ts",
+    "src/modules/cms/programs",
+    "src/modules/cms/episodes",
+    "src/modules/cms/categories",
+    "src/modules/discovery/programs",
+    "src/database/entities/category.entity.ts",
+    "src/database/entities/external-program-ref.entity.ts",
+    "src/database/entities/external-episode-ref.entity.ts",
+    "src/common/enums/content-status.enum.ts",
+    "src/modules/cms/import/source-connector.interface.ts"
+  ]
+}

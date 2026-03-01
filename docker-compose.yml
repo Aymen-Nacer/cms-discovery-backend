@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cms-discovery-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cms_discovery
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cms-discovery-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: cms_discovery
+      JWT_SECRET: change-me-to-a-strong-secret
+      JWT_EXPIRES_IN: 1d
+      CMS_ADMIN_EMAIL: admin@thmanyah.com
+      CMS_ADMIN_PASSWORD_HASH: '$$2b$$10$$iwkfLL/H5rqkajjYktChbOTtt33mN/JPyFHnn0ZpYt2rq3kT3OTVG'
+      CMS_EDITOR_EMAIL: editor@thmanyah.com
+      CMS_EDITOR_PASSWORD_HASH: '$$2b$$10$$uaQ.t.wSxKvJr5RLYDMdbusat6Y9MClj6J73NKPihUNlxICNEIuhS'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "node -e \"require('./dist/database/typeorm-data-source').AppDataSource.initialize().then(ds=>ds.runMigrations()).then(()=>process.exit(0))\" && npm run start:prod"
+
+volumes:
+  postgres_data:
